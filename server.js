@@ -33,7 +33,8 @@ let friendList = [{
         5,
         4,
         1
-    ]
+    ],
+    "match": "false"
 }, {
     "name": "John",
     "photo": "https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/6/005/064/1bd/3435aa3.jpg",
@@ -48,7 +49,8 @@ let friendList = [{
         4,
         3,
         2
-    ]
+    ],
+    "match": "false"
 }, {
     "name": "Paul",
     "photo": "https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/6/005/064/1bd/3435aa3.jpg",
@@ -63,7 +65,8 @@ let friendList = [{
         4,
         4,
         1
-    ]
+    ],
+    "match": "false"
 }];
 
 // HTML Route handling
@@ -97,56 +100,74 @@ app.post("/api/friends", function(req, res) {
     // This works because of our body parsing middleware
     let newFriend = req.body;
 
+    // capture incoming score
     let newScore = newFriend.scores;
-
+    // and parse as INT so we can do math
     newScore = newScore.map(function(x) {
         return parseInt(x, 10);
     });
 
-    let allScores = [];
+    // creating copy of array 
+    let allFriends = [];
 
+    // loop over the copy of the friend list array and replace scores strings with integers
     friendList.forEach(element => {
         // console.log(element.scores);
-        element = element.scores;
-        element = element.map(function(x) {
+        parseScores = element.scores;
+        parseScores = parseScores.map(function(x) {
             return parseInt(x, 10);
         });
-        let scoreObj = {};
-        scoreObj = element;
-        allScores.push(scoreObj);
+        allFriends.push(element);
     });
 
+    console.log(allFriends);
 
-
+    // creating array for adding array of the difference between the new score and all of the friends scores
     let bigDiffList = [];
 
-    for (var i = 0; i < allScores.length; i++) {
-
-        let comparedScore = allScores[i];
+    for (var i = 0; i < allFriends.length; i++) {
+        let comparedScore = allFriends[i].scores;
         let diffList = [];
+        // loop inside the loop, for each array of scores, loop over them and find the difference between each element in the array and the corresponding element in the new score array
         for (var j = 0; j < newScore.length; j++) {
             let difference = diff(newScore[j], comparedScore[j]);
             diffList.push(difference);
         }
-        let diffObj = {};
-        diffObj = diffList;
 
-        bigDiffList.push(diffObj);
-    }
+        bigDiffList.push(diffList);
 
-    let finalDiffList = [];
-    bigDiffList.forEach(element => {
-        let sumObj = sumArray(element);
-        finalDiffList.push(sumObj);
-    });
-    console.log(finalDiffList);
+        }
 
-    console.log(Math.min(...finalDiffList));
+        // to do; when sending out true love, make it so that the user can have multiple true loves...
+
+        let finalDiffList = [];
+
+        // loop over the array of arrays and find the sum of each element within each array, send that to a final array...
+        bigDiffList.forEach(element => {
+            let sumObj = sumArray(element);
+            finalDiffList.push(sumObj);
+        });
+
+        //... and find the lowest number in the final array, the one true love with the least difference
+        let matchNumber = Math.min(...finalDiffList); 
+
+        for(i = 0; i < finalDiffList.length; i++){
+            if(finalDiffList[i] == matchNumber){
+                // set match value to true of the person object with the same index as the lowest number in the final diff list array
+                allFriends[i].match = "true";
+                // define the one true love
+                let trueLove = allFriends[i];
+                // sends the response body containing the one true love, the object where match = true
+                res.json(trueLove);
+                // breaks the for loop so it doesn't keep looping after it has found the true love
+                break;
+            }
+        }
+
+        console.log(allFriends);
 
     // wait until end of function to push new friend to friend list, so we don't match the new friend with itself
     friendList.push(newFriend);
-
-    res.json(newFriend);
 });
 
 // initiate server
