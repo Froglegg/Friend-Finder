@@ -15,6 +15,8 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="geocities.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/7b1798d8eb.js"></script>
+
 
 </head>
 
@@ -160,10 +162,19 @@
         <br>
         <br>
 
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit"><i class="fa fa-check-circle" aria-hidden="true"></i>
-         Submit</button>
-
+        <!-- Submit and Reset Buttons -->
+        <div class="container">
+            <div class="row">
+                <div class="col col-sm-3">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit"><i class="fa fa-check-circle" aria-hidden="true"></i>
+         Submit</button></div>
+                <br>
+                <div class="col col-sm-3">
+                    <button class="btn btn-danger" id="reset"><i class="fas fa-eraser"></i>
+            Clear Form</button>
+                </div>
+            </div>
+        </div>
         <hr>
         <footer class="footer">
             <div class="container">
@@ -197,6 +208,12 @@
     </div>
 
     <script type="text/javascript">
+        $("#reset").bind("click", function() {
+            console.log("fired!");
+            $(".chosen-select").val("");
+            $(".form-control").val("");
+        });
+
         $("#submit").on("click", function(event) {
             event.preventDefault;
 
@@ -232,7 +249,8 @@
                 let userObject = {
                     name: $("#name").val(),
                     photo: $("#photo").val(),
-                    scores: scoreList
+                    scores: scoreList,
+                    match: "false"
                 };
 
                 $.post("/api/friends", userObject, function(data) {

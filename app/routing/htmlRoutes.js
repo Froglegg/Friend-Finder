@@ -1,20 +1,17 @@
-// Route handling
-const htmlRoutes = function() {
-    app.get("/", function(req, res) {
-        res.sendFile(path.join(__dirname, "app/public/home.html"));
+let path = require("path");
 
+// since we are exporting just this one function, no need to store module-exports into a variable, just define it outright
+// define module exports as a function that takes the app parameter, which is our express instance in server.js 
+
+module.exports = function(app) {
+    // if user enters survey in URL or presses survey button, serves the survey HTML file
+    app.get("/survey", function(req, res) {
+        // the __dirname parameter ensures we begin ine root directory
+        res.sendFile(path.join(__dirname, "/../public/survey.html"));
     });
 
-    app.get("/:var", function(req, res) {
-        let rootVar = req.params.var;
-        if (rootVar === "survey" || rootVar === "survey.html") {
-            res.sendFile(path.join(__dirname, "app/public/survey.html"));
-        } else if (rootVar === "home" || rootVar === "home.html") {
-            res.sendFile(path.join(__dirname, "app/public/home.html"));
-        } else {
-            res.sendFile(path.join(__dirname, "app/public/404.html"));
-        }
-    })
-}
-
-module.exports = htmlRoutes;
+    // fallback use route for homepage
+    app.use(function(req, res) {
+        res.sendFile(path.join(__dirname, "/../public/home.html"));
+    });
+};
